@@ -20,9 +20,13 @@ public:
 private slots:
     void on_pushLoad_clicked();
 
+    void on_sliderPosition_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
     VoxelData vdata;
+    QImage img;
+    QGraphicsScene scene;
 };
 
 #endif // MAINWINDOW_H

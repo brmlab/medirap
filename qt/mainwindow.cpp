@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <qdebug.h>
+#include <QMessageBox>
 
 #define BLACK 0xFF000000
 #define RED   0xFFFF0000
@@ -13,7 +14,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
 }
 
 MainWindow::~MainWindow()
@@ -26,7 +26,13 @@ void MainWindow::on_pushLoad_clicked()
     QString filename = QFileDialog::getOpenFileName(this, "Open Image", "", "Series of medical files (*.txt)");
     if (filename.isNull()) return;
     QFileInfo pathInfo(filename);
-    vdata.load(pathInfo.path(), pathInfo.fileName());
+    if (!vdata.load(pathInfo.path(), pathInfo.fileName())) {
+        QMessageBox("Error", "Error loading data");
+    } else {
+        ui->sliderPosition->setMaximum(vdata.getDimZ());
+        ui->sliderPosition->setValue(vdata.getDimZ()/2);
+    }
+
 }
 
 /*
@@ -124,3 +130,11 @@ void MainWindow::floodfill(QImage &img)
 
 }
 */
+
+void MainWindow::on_sliderPosition_valueChanged(int value)
+{
+    QPixmap pixmap;
+    scene.clear();
+    pixmap.convertFromImage(image);
+    scene.addPixmap(pixmap);
+}

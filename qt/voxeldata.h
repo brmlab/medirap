@@ -3,7 +3,7 @@
 
 #include <QString>
 
-#define VOXELDATA char
+#define VOXELDATA unsigned char
 
 class VoxelData
 {

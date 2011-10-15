@@ -11,7 +11,7 @@ bool VoxelData::load(QString path, QString filename)
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return false;
     QTextStream in(&file);
-    int i = 0;
+    int z = 0;
     data = new VOXELDATA[512*512*512];
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -20,10 +20,14 @@ bool VoxelData::load(QString path, QString filename)
         img.load(path + "/" + line);
         dimx = img.width();
         dimy = img.height();
-        qDebug() << img.format() ;
-        i++;
+        for (int x = 0; x < dimx; ++x) {
+            for (int y = 0; y < dimy; ++y) {
+                data[ x + y*512 + z*512*512] = img.pixel(x,y) & 0xFF;
+            }
+        }
+        z++;
     }
-    dimz = i;
+    dimz = z;
     file.close();
     return true;
 }
