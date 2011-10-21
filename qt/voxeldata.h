@@ -2,8 +2,8 @@
 #define VOXELDATA_H
 
 #include <QString>
-
-#define VOXELDATA unsigned char
+#include <QImage>
+#include <QVector>
 
 class VoxelData
 {
@@ -12,9 +12,10 @@ public:
     inline int getDimY() { return dimy; }
     inline int getDimZ() { return dimz; }
     bool load(QString path, QString filename);
+    const QImage *getSlice(int z);
 private:
     int dimx, dimy, dimz;
-    VOXELDATA *data;
+    QVector<QImage *> data;
 };
 
 #endif

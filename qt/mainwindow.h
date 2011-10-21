@@ -22,10 +22,13 @@ private slots:
 
     void on_sliderPosition_valueChanged(int value);
 
+    void on_sliderThreshold_valueChanged(int value);
+
+    void on_checkThreshold_clicked();
+
 private:
     Ui::MainWindow *ui;
     VoxelData vdata;
-    QImage img;
     QGraphicsScene scene;
 };
 

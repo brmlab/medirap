@@ -4,16 +4,12 @@
 #include <qdebug.h>
 #include <QMessageBox>
 
-#define BLACK 0xFF000000
-#define RED   0xFFFF0000
-#define WHITE 0xFFFFFFFF
-#define BLUE  0xFF0000FF
-
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->graphicsView->setScene(&scene);
 }
 
 MainWindow::~MainWindow()
@@ -27,12 +23,11 @@ void MainWindow::on_pushLoad_clicked()
     if (filename.isNull()) return;
     QFileInfo pathInfo(filename);
     if (!vdata.load(pathInfo.path(), pathInfo.fileName())) {
-        QMessageBox("Error", "Error loading data");
+        qDebug() << "Error loading data";
     } else {
-        ui->sliderPosition->setMaximum(vdata.getDimZ());
+        ui->sliderPosition->setMaximum(vdata.getDimZ()-1);
         ui->sliderPosition->setValue(vdata.getDimZ()/2);
     }
-
 }
 
 /*
@@ -134,7 +129,31 @@ void MainWindow::floodfill(QImage &img)
 void MainWindow::on_sliderPosition_valueChanged(int value)
 {
     QPixmap pixmap;
+    if (ui->checkThreshold->checkState() != Qt::Unchecked) {
+        int threshold = ui->sliderThreshold->value();
+        QImage *img = new QImage(*vdata.getSlice(value));
+        for (int x = 0; x < img->width(); ++x) {
+            for (int y = 0; y < img->height(); ++y) {
+                img->setPixel(x,y, ((img->pixel(x,y) & 0xFF) > threshold) ? 255 : 0);
+            }
+        }
+        pixmap.convertFromImage(*img);
+        delete img;
+    } else {
+        pixmap.convertFromImage(*vdata.getSlice(value));
+    }
     scene.clear();
-    pixmap.convertFromImage(image);
     scene.addPixmap(pixmap);
+}
+
+void MainWindow::on_sliderThreshold_valueChanged(int value)
+{
+    if (ui->checkThreshold->checkState() != Qt::Unchecked) {
+        on_sliderPosition_valueChanged(ui->sliderPosition->value());
+    }
+}
+
+void MainWindow::on_checkThreshold_clicked()
+{
+    on_sliderPosition_valueChanged(ui->sliderPosition->value());
 }
